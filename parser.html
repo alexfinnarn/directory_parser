@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Directory Parser</title>
+</head>
+<body>
+<script type="text/javascript" src="./js/papaParse.js"></script>
+<script type="text/javascript" src="./js/processor.js"></script>
+<form action="">
+  <label for="csv_upload">Select the Directory CSV file</label>
+  <!--<input type="file" id="csv_upload" name="csv_upload" accept=".csv" multiple>-->
+  <input type="file" id="csv_upload" name="csv_upload" accept=".csv">
+  <button type="button" onclick="submitData()">Upload</button>
+</form>
+<script type="text/javascript">
+  var input = document.querySelector('#csv_upload');
+  input.addEventListener('change', updateFile);
+</script>
+</body>
+</html>
