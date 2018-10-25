@@ -80,7 +80,8 @@ function compileResults(results, file) {
       // If header value is blank, then it is a parent of something.
       if (el[orgLevelHeaders[i]] === '') {
         eval(varString + " = {}");
-        eval(varString += ".data = {}");
+        eval(varString + ".data = {}");
+        eval(varString + ".children = {}");
 
         // Gather data.
         data = {};
@@ -95,7 +96,8 @@ function compileResults(results, file) {
       if (i === orgLevelHeaders.length - 1) {
         varString += '["' + el[orgLevelHeaders[i]] + '"]';
         eval(varString + " = {}");
-        eval(varString += ".data = {}");
+        eval(varString + ".data = {}");
+        eval(varString + ".children = {}");
 
         // Gather data.
         data = {};
@@ -108,7 +110,11 @@ function compileResults(results, file) {
       }
 
       // If it isn't blank, then add it to the variable string.
-      varString += '["' + el[orgLevelHeaders[i]] + '"]';
+      if (i === 0) {
+        varString += '["' + el[orgLevelHeaders[i]] + '"]';
+      } else {
+        varString += '.children["' + el[orgLevelHeaders[i]] + '"]';
+      }
 
       namey = el[orgLevelHeaders[i]];
     }
