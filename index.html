@@ -3,21 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <title>Directory Parser</title>
+
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+  <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+          integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+          crossorigin="anonymous">
+  </script>
 </head>
 <body>
+
 <script type="text/javascript" src="./js/papaParse.js"></script>
 <script type="text/javascript" src="./js/processor.js"></script>
-<form action="">
-  <label for="org_level_headers">Add level headers in descending order:</label>
-  <input type="text" id="org_level_headers" name="org_level_headers" value="">
-  <label for="csv_upload">Select the Directory CSV file</label>
-  <!--<input type="file" id="csv_upload" name="csv_upload" accept=".csv" multiple>-->
-  <input type="file" id="csv_upload" name="csv_upload" accept=".csv">
-  <button type="button" onclick="submitData()">Upload</button>
-</form>
-<pre>
-  <span id="errors"></span>
-</pre>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="panel panel-default col-md-offset-3 col-md-6">
+      <div class="panel-heading">
+        <h2>Directory Parser</h2>
+      </div>
+      <form class="panel-body">
+        <div class="form-group">
+          <label for="org_level_headers">Add level headers in descending order:</label>
+          <input type="text"
+                 id="org_level_headers"
+                 class="form-control"
+                 name="org_level_headers"
+                 value="">
+        </div>
+        <div class="form-group">
+          <label for="csv_upload">Select the Directory CSV file</label>
+          <!--<input type="file" id="csv_upload" name="csv_upload" accept=".csv" multiple>-->
+          <input type="file"
+                 id="csv_upload"
+                 class="form-control"
+                 name="csv_upload"
+                 accept=".csv">
+        </div>
+        <div class="form-group">
+          <button class=" upload-button btn btn-primary" onclick="submitData()">Upload</button>
+        </div>
+      </form>
+      <h3>Messages:</h3>
+      <pre>
+      <span id="messages"></span>
+    </pre>
+    </div>
+  </div>
+</div>
+
 <script type="text/javascript">
   var uploadFile = document.querySelector('#csv_upload');
   uploadFile.addEventListener('change', updateFile);
