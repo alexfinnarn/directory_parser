@@ -18,7 +18,6 @@
   </script>
 </head>
 <body>
-
 <script type="text/javascript" src="./js/papaParse.js"></script>
 <script type="text/javascript" src="./js/processor.js"></script>
 
@@ -39,7 +38,6 @@
         </div>
         <div class="form-group">
           <label for="csv_upload">Select the Directory CSV file</label>
-          <!--<input type="file" id="csv_upload" name="csv_upload" accept=".csv" multiple>-->
           <input type="file"
                  id="csv_upload"
                  class="form-control"
@@ -59,7 +57,7 @@
 </div>
 
 <script type="text/javascript">
-  var uploadFile = document.querySelector('#csv_upload');
+  const uploadFile = document.querySelector('#csv_upload');
   uploadFile.addEventListener('change', updateFile);
 
   document.querySelector('#org_level_headers').value = orgLevelHeaders;

@@ -1,13 +1,11 @@
 // Initialize variables.
-var currentFiles = {};
-var parsedData = {};
-var namey = '';
+let currentFiles = {};
 
 // @todo Replace with localStorage.
-var orgLevelHeaders = ['Senior','Parent','Department','Subunit'];
+let orgLevelHeaders = ['Senior','Parent','Department','Subunit'];
 
 // Config object needed for the Papa parser.
-var parseConfig = {
+const parseConfig = {
   delimiter: ",",
   newline: "",	// auto-detect
   quoteChar: '"',
@@ -67,61 +65,69 @@ function compileResults(results, file) {
 
   // Cut the data headers from the levels.
   // Length will be the number of columns needed to determine hierarchy.
-  var dataHeaders = results.meta.fields.splice(orgLevelHeaders.length);
+  const dataHeaders = results.meta.fields.splice(orgLevelHeaders.length);
 
-  var finalData = {};
-  var i = 0;
-  var varString = 'finalData';
-  var data = {};
-  results.data.forEach(function (el, index) {
+  let finalData = {};
+  let i = 0;
+  let varString = 'finalData';
+  let data = {};
+  let lastOrgName = '';
+  results.data.forEach(function (el) {
+    try {
+      for (i = 0; i < orgLevelHeaders.length; i++) {
 
-    for (i = 0; i < orgLevelHeaders.length; i++) {
+        // If header value is blank, then it is a parent of something.
+        if (el[orgLevelHeaders[i]] === '') {
+          eval(varString + " = {}");
+          eval(varString + ".data = {}");
+          eval(varString + ".children = {}");
 
-      // If header value is blank, then it is a parent of something.
-      if (el[orgLevelHeaders[i]] === '') {
-        eval(varString + " = {}");
-        eval(varString + ".data = {}");
-        eval(varString + ".children = {}");
+          // Gather data.
+          data = {};
+          dataHeaders.forEach(function (header, ind) {
+            data[header] = el[header];
+          });
 
-        // Gather data.
-        data = {};
-        dataHeaders.forEach(function (header, ind) {
-          data[header] = el[header];
-        });
+          eval(varString + ".data = " + JSON.stringify(data) + ';');
+          break;
+        }
 
-        eval(varString + ".data = " + JSON.stringify(data) + ';');
-        break;
+        if (i === orgLevelHeaders.length - 1) {
+          varString += '["' + el[orgLevelHeaders[i]] + '"]';
+          eval(varString + " = {}");
+          eval(varString + ".data = {}");
+          eval(varString + ".children = {}");
+
+          // Gather data.
+          data = {};
+          dataHeaders.forEach(function (header, ind) {
+            data[header] = el[header];
+          });
+
+          eval(varString + ".data = " + JSON.stringify(data) + ';');
+          break;
+        }
+
+        // If it isn't blank, then add it to the variable string.
+        if (i === 0) {
+          varString += '["' + el[orgLevelHeaders[i]] + '"]';
+        } else {
+          varString += '.children["' + el[orgLevelHeaders[i]] + '"]';
+        }
+
+        lastOrgName = el[orgLevelHeaders[i]];
       }
-
-      if (i === orgLevelHeaders.length - 1) {
-        varString += '["' + el[orgLevelHeaders[i]] + '"]';
-        eval(varString + " = {}");
-        eval(varString + ".data = {}");
-        eval(varString + ".children = {}");
-
-        // Gather data.
-        data = {};
-        dataHeaders.forEach(function (header, ind) {
-          data[header] = el[header];
-        });
-
-        eval(varString + ".data = " + JSON.stringify(data) + ';');
-        break;
-      }
-
-      // If it isn't blank, then add it to the variable string.
-      if (i === 0) {
-        varString += '["' + el[orgLevelHeaders[i]] + '"]';
-      } else {
-        varString += '.children["' + el[orgLevelHeaders[i]] + '"]';
-      }
-
-      namey = el[orgLevelHeaders[i]];
+    }
+    catch {
+      // Send message of last orgname that failed the parsing.
+      document.getElementById('messages').innerText = 'Parsing CSV file failed. Last Org parsed: ' + lastOrgName;
     }
 
+    // Reset variable string for next row.
     varString = 'finalData';
   });
 
+  // Trigger download.
   downloadFile(finalData);
 }
 
@@ -142,12 +148,17 @@ function handleErrors(currentFiles, orgLevelHeaders) {
   return null;
 }
 
+/**
+ * Downloads a file via the browser. Called from Papa Parse callback.
+ *
+ * @param finalData
+ */
 function downloadFile(finalData) {
   const data = new Blob([JSON.stringify(finalData, null, 2)], {type : 'application/json'});
 
   if (navigator.msSaveBlob) {
     // IE 10+.
-    navigator.msSaveBlob(data, fileName);
+    navigator.msSaveBlob(data, 'directory.json');
   } else {
     const link = document.createElement('a');
     if (link.download !== undefined) {
