@@ -18,7 +18,6 @@ const parseConfig = {
   worker: false,
   comments: false,
   step: undefined,
-  // complete: compileTreeResults,
   complete: compileResults,
   error: undefined,
   download: false,
@@ -56,8 +55,6 @@ function submitData(event) {
   } else {
     parseConfig.complete = compileTreeResults;
   }
-
-  console.log(parseConfig);
 
   // Handle any errors.
   // @todo Make this an early exit.
