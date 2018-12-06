@@ -45,7 +45,17 @@
                  accept=".csv">
         </div>
         <div class="form-group">
-          <button class=" upload-button btn btn-primary" onclick="submitData()">Upload</button>
+          <label for="csv_upload">Select the JSON output structure</label>
+          <select type="file"
+                 id="output_structure"
+                 class="form-control"
+                 name="output_structure">
+            <option value="compileResults">Flat - Row by Row</option>
+            <option value="compileTreeResults">Tree - Org Hierarchy</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <button class=" upload-button btn btn-primary" onclick="submitData(event)">Upload</button>
         </div>
       </form>
       <h3>Messages:</h3>

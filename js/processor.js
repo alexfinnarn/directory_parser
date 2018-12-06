@@ -2,7 +2,7 @@
 let currentFiles = {};
 
 // @todo Replace with localStorage.
-let orgLevelHeaders = ['Senior','Parent','Department','Subunit'];
+let orgLevelHeaders = ['Senior', 'Parent', 'Department', 'Subunit'];
 
 // Config object needed for the Papa parser.
 const parseConfig = {
@@ -18,6 +18,7 @@ const parseConfig = {
   worker: false,
   comments: false,
   step: undefined,
+  // complete: compileTreeResults,
   complete: compileResults,
   error: undefined,
   download: false,
@@ -41,10 +42,22 @@ function updateFile() {
 /**
  * Handle submission of the form.
  */
-function submitData() {
+function submitData(event) {
+
+  event.preventDefault();
 
   // Get headers from input.
-  orgLevelHeaders = document.getElementById('org_level_headers').value.split(',');
+  const orgLevelHeaders = document.getElementById('org_level_headers').value.split(',');
+
+  // Grab the type of parsing requested: tree or flat.
+  const parseType = document.getElementById('output_structure').value;
+  if (parseType === 'compileResults') {
+    parseConfig.complete = compileResults;
+  } else {
+    parseConfig.complete = compileTreeResults;
+  }
+
+  console.log(parseConfig);
 
   // Handle any errors.
   // @todo Make this an early exit.
@@ -55,12 +68,58 @@ function submitData() {
 }
 
 /**
- * Callback for parsing the CSV file.
+ * Callback for parsing the CSV file in a flat structure row by row.
  *
  * @param results
  * @param file
  */
 function compileResults(results, file) {
+  console.log("Parsing complete:", results, file);
+
+  // Cut the data headers from the levels.
+  // Length will be the number of columns needed to determine hierarchy.
+  const dataHeaders = results.meta.fields.splice(orgLevelHeaders.length);
+
+  let finalData = [];
+  let lastOrgName = '';
+  results.data.forEach(function (el) {
+    try {
+      // Gather data.
+      let data = {};
+      data.orgNames = '';
+
+      orgLevelHeaders.forEach(function (header, ind) {
+        if (el[header]) {
+          data.orgNames = el[header] + '|' + data.orgNames;
+        }
+      });
+
+      // Trim off last pipe.
+      data.orgNames = data.orgNames.substr(0, data.orgNames.length - 1);
+
+      dataHeaders.forEach(function (header, ind) {
+        data[header] = el[header];
+      });
+
+      finalData.push(data);
+    }
+    catch {
+      // Send message of last orgname that failed the parsing.
+      document.getElementById('messages').innerText = 'Parsing CSV file failed. Last Org parsed: ' + lastOrgName;
+    }
+  });
+
+  // Trigger download.
+  downloadFile(finalData);
+}
+
+/**
+ * Callback for parsing the CSV file into a tree grouped by "org_level_headers".
+ *
+ * @param results
+ * @param file
+ */
+function compileTreeResults(results, file) {
   console.log("Parsing complete:", results, file);
 
   // Cut the data headers from the levels.
@@ -154,7 +213,7 @@ function handleErrors(currentFiles, orgLevelHeaders) {
  * @param finalData
  */
 function downloadFile(finalData) {
-  const data = new Blob([JSON.stringify(finalData, null, 2)], {type : 'application/json'});
+  const data = new Blob([JSON.stringify(finalData, null, 2)], {type: 'application/json'});
 
   if (navigator.msSaveBlob) {
     // IE 10+.
